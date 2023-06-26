@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { MongoClient, ObjectId } from "mongodb";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { MongoClient, ObjectId } from 'mongodb';
+import { toast } from 'react-toastify';
+import { dbConnect } from '../../../lib/dbConnect';
 
 const EditItem = (props) => {
   const invoice = props.data;
@@ -9,23 +10,23 @@ const EditItem = (props) => {
 
   const [items, setItems] = useState(invoice.items);
 
-  const [senderStreet, setSenderStreet] = useState("");
-  const [senderCity, setSenderCity] = useState("");
-  const [senderPostalCode, setSenderPostalCode] = useState("");
-  const [senderCountry, setSenderCountry] = useState("");
-  const [clientName, setClientName] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
-  const [clientStreet, setClientStreet] = useState("");
-  const [clientCity, setClientCity] = useState("");
-  const [clientPostalCode, setClientPostalCode] = useState("");
-  const [clientCountry, setClientCountry] = useState("");
-  const [description, setDescription] = useState("");
-  const [createdAt, setCreatedAt] = useState("");
-  const [paymentTerms, setPaymentTerms] = useState("");
+  const [senderStreet, setSenderStreet] = useState('');
+  const [senderCity, setSenderCity] = useState('');
+  const [senderPostalCode, setSenderPostalCode] = useState('');
+  const [senderCountry, setSenderCountry] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [clientStreet, setClientStreet] = useState('');
+  const [clientCity, setClientCity] = useState('');
+  const [clientPostalCode, setClientPostalCode] = useState('');
+  const [clientCountry, setClientCountry] = useState('');
+  const [description, setDescription] = useState('');
+  const [createdAt, setCreatedAt] = useState('');
+  const [paymentTerms, setPaymentTerms] = useState('');
 
   // add product item
   const addItem = () => {
-    setItems([...items, { name: "", quantity: 0, price: 0, total: 0 }]);
+    setItems([...items, { name: '', quantity: 0, price: 0, total: 0 }]);
   };
 
   // handler change
@@ -33,7 +34,7 @@ const EditItem = (props) => {
     const { name, value } = event.target;
     const list = [...items];
     list[i][name] = value;
-    list[i]["total"] = list[i]["quantity"] * list[i]["price"];
+    list[i]['total'] = list[i]['quantity'] * list[i]['price'];
     setItems(list);
   };
 
@@ -51,9 +52,9 @@ const EditItem = (props) => {
   const updateInvoice = async (invoiceId, status) => {
     try {
       const res = await fetch(`/api/edit/${invoiceId}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           senderStreet: senderStreet,
@@ -81,7 +82,7 @@ const EditItem = (props) => {
       router.push(`/invoices/${invoiceId}`);
       toast.success(data.message);
     } catch (error) {
-      toast.error("Something went wrong!");
+      toast.error('Something went wrong!');
     }
   };
 
@@ -297,19 +298,17 @@ const EditItem = (props) => {
             Add New Item
           </button>
 
-          <div className="new__invoice__btns" style={{ justifyContent: "end" }}>
+          <div className="new__invoice__btns" style={{ justifyContent: 'end' }}>
             <div>
               <button
                 className="draft__btn"
-                onClick={() => router.push(`/invoices/${invoice.id}`)}
-              >
+                onClick={() => router.push(`/invoices/${invoice.id}`)}>
                 Cancel
               </button>
 
               <button
                 className="mark__as-btn"
-                onClick={() => updateInvoice(invoice.id, invoice.status)}
-              >
+                onClick={() => updateInvoice(invoice.id, invoice.status)}>
                 Save Changes
               </button>
             </div>
@@ -323,18 +322,15 @@ const EditItem = (props) => {
 export default EditItem;
 
 export async function getStaticPaths() {
-  const client = await MongoClient.connect(
-    `mongodb+srv://${process.env.USER__NAME}:${process.env.USER__PASSWORD}@cluster0.ishut.mongodb.net/${process.env.DATABASE__NAME}?retryWrites=true&w=majority`,
-    { useNewUrlParser: true }
-  );
+  const client = await dbConnect();
 
   const db = client.db();
-  const collection = db.collection("allInvoices");
+  const collection = db.collection('allInvoices');
 
   const invoices = await collection.find({}, { _id: 1 }).toArray();
 
   return {
-    fallback: "blocking",
+    fallback: 'blocking',
     paths: invoices.map((invoice) => ({
       params: {
         invoiceId: invoice._id.toString(),
@@ -346,13 +342,10 @@ export async function getStaticPaths() {
 export async function getStaticProps(context) {
   const { invoiceId } = context.params;
 
-  const client = await MongoClient.connect(
-    `mongodb+srv://${process.env.USER__NAME}:${process.env.USER__PASSWORD}@cluster0.ishut.mongodb.net/${process.env.DATABASE__NAME}?retryWrites=true&w=majority`,
-    { useNewUrlParser: true }
-  );
+  const client = await dbConnect();
 
   const db = client.db();
-  const collection = db.collection("allInvoices");
+  const collection = db.collection('allInvoices');
   const invoice = await collection.findOne({ _id: ObjectId(invoiceId) });
 
   return {

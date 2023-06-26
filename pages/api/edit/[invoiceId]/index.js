@@ -1,15 +1,13 @@
-import { MongoClient, ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
+import { dbConnect } from '../../../../lib/dbConnect';
 
 async function handler(req, res) {
   const { invoiceId } = req.query;
-  const client = await MongoClient.connect(
-    `mongodb+srv://${process.env.USER__NAME}:${process.env.USER__PASSWORD}@cluster0.ishut.mongodb.net/${process.env.DATABASE__NAME}?retryWrites=true&w=majority`,
-    { useNewUrlParser: true }
-  );
+  const client = await dbConnect();
   const db = client.db();
-  const collection = db.collection("allInvoices");
+  const collection = db.collection('allInvoices');
 
-  if (req.method === "PUT") {
+  if (req.method === 'PUT') {
     await collection.updateOne(
       {
         _id: ObjectId(invoiceId),
@@ -41,7 +39,7 @@ async function handler(req, res) {
       }
     );
 
-    res.status(200).json({ message: "Invoice updated successfully" });
+    res.status(200).json({ message: 'Invoice updated successfully' });
   }
 
   client.close();

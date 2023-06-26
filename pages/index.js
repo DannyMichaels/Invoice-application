@@ -1,12 +1,12 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { MongoClient } from "mongodb";
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { dbConnect } from '../lib/dbConnect';
 
 export default function Home(props) {
   const router = useRouter();
   const { data } = props;
 
-  const navigatePage = () => router.push("/add-new");
+  const navigatePage = () => router.push('/add-new');
 
   return (
     <div className="main__container">
@@ -47,13 +47,12 @@ export default function Home(props) {
               <div>
                 <button
                   className={`${
-                    invoice.status === "paid"
-                      ? "paid__status"
-                      : invoice.status === "pending"
-                      ? "pending__status"
-                      : "draft__status"
-                  }`}
-                >
+                    invoice.status === 'paid'
+                      ? 'paid__status'
+                      : invoice.status === 'pending'
+                      ? 'pending__status'
+                      : 'draft__status'
+                  }`}>
                   {invoice.status}
                 </button>
               </div>
@@ -66,13 +65,10 @@ export default function Home(props) {
 }
 
 export async function getStaticProps() {
-  const client = await MongoClient.connect(
-    `mongodb+srv://${process.env.USER__NAME}:${process.env.USER__PASSWORD}@cluster0.ishut.mongodb.net/${process.env.DATABASE__NAME}?retryWrites=true&w=majority`,
-    { useNewUrlParser: true }
-  );
+  const client = await dbConnect();
 
   const db = client.db();
-  const collection = db.collection("allInvoices");
+  const collection = db.collection('allInvoices');
 
   const invoices = await collection.find({}).toArray();
 

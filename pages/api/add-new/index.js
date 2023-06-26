@@ -1,12 +1,9 @@
-import { MongoClient } from "mongodb";
+import { dbConnect } from '../../../lib/dbConnect';
 
 async function handler(req, res) {
-  const client = await MongoClient.connect(
-    `mongodb+srv://${process.env.USER__NAME}:${process.env.USER__PASSWORD}@cluster0.ishut.mongodb.net/${process.env.DATABASE__NAME}?retryWrites=true&w=majority`,
-    { useNewUrlParser: true }
-  );
+  const client = await dbConnect();
 
-  if (req.method === "POST") {
+  if (req.method === 'POST') {
     const invoice = {
       senderAddress: {
         street: req.body.senderStreet,
@@ -32,10 +29,10 @@ async function handler(req, res) {
     };
 
     const db = client.db();
-    const collection = db.collection("allInvoices");
+    const collection = db.collection('allInvoices');
     await collection.insertOne(invoice);
 
-    res.status(200).json({ message: "Invoice added successfully" });
+    res.status(200).json({ message: 'Invoice added successfully' });
 
     client.close();
   }
